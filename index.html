@@ -50,23 +50,24 @@
       }
 
       /* === ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ === */
-      
-      /* 1. Учёт высоты адресной строки на мобильных */
       #hero {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         min-height: 100dvh;
+        padding: 100px 20px 40px;
+        box-sizing: border-box;
       }
 
-      /* 2. Отступ сверху для мобильных, чтобы фото не залезало под хедер */
       @media (max-width: 768px) {
         #hero {
           padding-top: 220px;
-          scroll-margin-top: 50px;
+          padding-bottom: 30px;
         }
       }
 
-      /* 3. Чтобы якорные ссылки не перекрывались хедером */
       #services, #portfolio, #calculator, #contact {
-        scroll-margin-top: 50px;
+        scroll-margin-top: 100px;
       }
     </style>
   <script type="importmap">
