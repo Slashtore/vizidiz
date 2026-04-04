@@ -13,11 +13,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
-    # ← ДОБАВЬ ЭТОТ БЛОК ↓
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    # ← ДОБАВЬ ЭТОТ БЛОК ↑
     
     steps:
       - uses: actions/checkout@v4
