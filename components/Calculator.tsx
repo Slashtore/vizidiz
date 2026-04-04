@@ -92,7 +92,7 @@ const Calculator: React.FC = () => {
   const HARDCODED_PASSWORD = "3dviz";
   const DEFAULT_CONFIG: CalculatorConfig = {
     rates: {
-      interior: 500,
+      interior: 400,
       exteriorBase: 15000,
       exteriorView: 5000,
       product: 5000,
