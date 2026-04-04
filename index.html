@@ -48,17 +48,24 @@
         background: #64748b;
       }
 
-      /* === ТОЛЬКО МОБИЛЬНЫЕ — отключаем 100dvh и добавляем отступы === */
+      /* === МОБИЛЬНЫЕ: Hero и Услуги === */
       @media (max-width: 768px) {
+        /* 1. Hero: отменяем фиксированную высоту и даем отступы */
         #hero {
           min-height: auto !important;
-          padding-top: 300px !important;
-          padding-bottom: 300px !important;
-          box-sizing: border-box;
+          height: auto !important;
+          padding-top: 140px !important;
+          padding-bottom: 80px !important;
+        }
+
+        /* 2. Услуги: сдвигаем вниз, чтобы не наезжали */
+        #services {
+          padding-top: 60px !important;
+          margin-top: 0 !important;
         }
       }
 
-      /* === ЯКОРЯ — чтобы хедер не перекрывал заголовки секций === */
+      /* === ЯКОРЯ: чтобы хедер не перекрывал заголовки === */
       #services, #portfolio, #calculator, #contact {
         scroll-margin-top: 100px;
       }
