@@ -95,7 +95,7 @@ const Calculator: React.FC = () => {
       interior: 400,
       exteriorBase: 15000,
       exteriorView: 5000,
-      product: 5000,
+      product: 4000,
       modeling: 4000,
       promo: 6000
     },
