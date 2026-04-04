@@ -34,7 +34,6 @@
         background-color: #0f172a;
         color: #e2e8f0;
       }
-      /* Custom scrollbar for webkit */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -49,13 +48,11 @@
         background: #64748b;
       }
 
-      /* === ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ === */
+      /* === МОБИЛЬНЫЕ — ПРОСТО ОТСТУПЫ === */
       #hero {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
         min-height: 100dvh;
-        padding: 100px 20px 40px;
+        padding-top: 120px;
+        padding-bottom: 60px;
         box-sizing: border-box;
       }
 
@@ -67,7 +64,7 @@
       }
 
       #services, #portfolio, #calculator, #contact {
-        scroll-margin-top: 100px;
+        scroll-margin-top: 30px;
       }
     </style>
   <script type="importmap">
