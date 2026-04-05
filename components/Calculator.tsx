@@ -52,6 +52,11 @@ interface CalculatorConfig {
   rates: Rates;
   timelineBaselines: TimelineBaselines;
   multipliers: Multipliers;
+  volumeDiscounts: {
+    low: { threshold3: number; threshold5: number; threshold10: number };
+    medium: { threshold3: number; threshold5: number; threshold10: number };
+    high: { threshold3: number; threshold5: number; threshold10: number };
+  };
   minHourlyRate: number;
   minOrderPrice: number;
 }
@@ -118,6 +123,24 @@ const Calculator: React.FC = () => {
       resolutionFactor: 0.1,
       busyClient: 1.2
     },
+  // === Скидки за объём ===
+  volumeDiscounts: {
+    low: { 
+      threshold3: 0.97,   // 3% скидка за 3+ объекта
+      threshold5: 0.94,   // 6% скидка за 5+ объектов
+      threshold10: 0.90   // 10% скидка за 10+ объектов
+    },
+    medium: { 
+      threshold3: 0.95,   // 5% скидка
+      threshold5: 0.90,   // 10% скидка
+      threshold10: 0.85   // 15% скидка
+    },
+    high: { 
+      threshold3: 0.93,   // 7% скидка
+      threshold5: 0.88,   // 12% скидка
+      threshold10: 0.82   // 18% скидка
+    }
+  },
     minHourlyRate: 500,
     minOrderPrice: 5000
   };
@@ -244,6 +267,7 @@ const Calculator: React.FC = () => {
             rates: { ...DEFAULT_CONFIG.rates, ...parsed.rates },
             timelineBaselines: { ...DEFAULT_CONFIG.timelineBaselines, ...parsed.timelineBaselines },
             multipliers: { ...DEFAULT_CONFIG.multipliers, ...parsed.multipliers },
+            volumeDiscounts: { ...DEFAULT_CONFIG.volumeDiscounts, ...parsed.volumeDiscounts },
             minHourlyRate: parsed.minHourlyRate || DEFAULT_CONFIG.minHourlyRate,
             minOrderPrice: parsed.minOrderPrice || DEFAULT_CONFIG.minOrderPrice
           };
@@ -288,6 +312,22 @@ const Calculator: React.FC = () => {
     return 1.0 + (extraMP * config.multipliers.resolutionFactor);
   };
 
+  const getVolumeDiscount = () => {
+    let quantity = 1;
+    
+    if (service === 'interior') quantity = Math.ceil(area / 50);
+    if (service === 'exterior' || service === 'promo') quantity = views;
+    if (service === 'product' || service === 'modeling') quantity = items;
+    
+    const discounts = config.volumeDiscounts[complexity as keyof typeof config.volumeDiscounts];
+    
+    if (quantity >= 10) return discounts.threshold10;
+    if (quantity >= 5) return discounts.threshold5;
+    if (quantity >= 3) return discounts.threshold3;
+    
+    return 1.0;
+  };
+
   const calculateTimeline = () => {
     let days = config.timelineBaselines[service];
     let volumeFactor = 0;
@@ -322,7 +362,12 @@ const Calculator: React.FC = () => {
       case 'exterior': cost = (config.rates.exteriorBase * cm) + (views * config.rates.exteriorView); break;
       case 'product':
         cost = items * config.rates.product * cm;
-        if (needModeling) cost += items * config.rates.modeling * cm;
+      if (needModeling) {
+        cost += items * config.rates.modeling * cm;
+        // === СКИДКА ЗА КОМПЛЕКСНУЮ УСЛУГУ ===
+        cost *= 0.85; // 10% скидка (0.85 = 85% от суммы)
+        // =====================================
+      }
         break;
       case 'modeling': cost = items * config.rates.modeling * cm; break;
     }
@@ -334,6 +379,7 @@ const Calculator: React.FC = () => {
     if (buyout) cost *= config.multipliers.buyout;
     if (nda) cost *= config.multipliers.nda;
     cost += modelsCost;
+    cost *= getVolumeDiscount();
     return Math.max(Math.round(cost), config.minOrderPrice);
   };
 
@@ -720,7 +766,7 @@ ${conditions.length > 0 ? conditions.join('\n') : 'Стандартные усл
                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-800">
                       <div className="flex flex-col">
                         <span className="text-sm text-slate-300">Нужно моделирование?</span>
-                        <span className="text-[10px] text-slate-500">Добавит стоимость моделинга</span>
+                        <span className="text-[10px] text-slate-500">+ моделинг со скидкой 15%</span>
                       </div>
                       <button onClick={() => setNeedModeling(!needModeling)} className={`w-10 h-5 rounded-full relative transition-colors ${needModeling ? 'bg-accent' : 'bg-slate-700'}`}>
                         <div className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-all ${needModeling ? 'left-6' : 'left-1'}`}></div>
@@ -843,9 +889,26 @@ ${conditions.length > 0 ? conditions.join('\n') : 'Стандартные усл
                 {/* Price Display */}
                 <div className="text-center py-4">
                   <div className="text-slate-400 text-sm mb-1">Ориентировочная стоимость</div>
+                  
+                  {/* Зачёркнутая старая цена (если есть скидка) */}
+                  {getVolumeDiscount() < 1 && (
+                    <div className="text-slate-500 text-lg line-through mb-1">
+                      {formatPrice(totalCost / getVolumeDiscount())}
+                    </div>
+                  )}
+                  
+                  {/* Новая цена со скидкой */}
                   <div className="text-4xl font-serif font-bold text-white mb-2 tracking-tight">
                     {formatPrice(totalCost)}
                   </div>
+                  
+                  {/* Бейдж со скидкой */}
+                  {getVolumeDiscount() < 1 && (
+                    <div className="text-xs text-green-400 bg-green-900/20 py-1 px-2 rounded inline-block">
+                      Скидка за объём {Math.round((1 - getVolumeDiscount()) * 100)}%
+                    </div>
+                  )}
+                  
                   {isMinPriceApplied && (
                     <div className="text-xs text-orange-400 bg-orange-900/20 py-1 px-2 rounded inline-block">
                       Минимальный заказ
