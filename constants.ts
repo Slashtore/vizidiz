@@ -5,7 +5,7 @@ export const COMPANY_INFO = {
   name: "VIZIDIZ",
   subtitle: "3D Visualization",
   phone: "+7 (916) 716-93-21",
-  email: "info@vizidiz3d.ru",
+  email: "info.vizidiz@gmail.com",
   address: "Воронеж",
   copyright: `© 2014 - ${new Date().getFullYear()} Vizidiz 3D Studio. Все права защищены.`
 };
