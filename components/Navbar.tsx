@@ -29,7 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, scrollToSection }) => {
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center cursor-pointer" onClick={() => handleNavClick('hero')}>
             <img 
-              src="/vizidiz/image/logo_vizidiz.png" 
+              src="/image/logo_vizidiz.png" 
               alt="VIZIDIZ" 
               className="h-8 w-auto object-contain" 
             />
