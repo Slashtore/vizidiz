@@ -901,6 +901,10 @@ ${conditions.length > 0 ? conditions.join('\n') : 'Стандартные усл
                   <div className="text-4xl font-serif font-bold text-white mb-2 tracking-tight">
                     {formatPrice(totalCost)}
                   </div>
+
+                  <div className="text-xs text-slate-500">
+                    Цена действительна до: {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('ru-RU')}
+                  </div>
                   
                   {/* Бейдж со скидкой */}
                   {getVolumeDiscount() < 1 && (
