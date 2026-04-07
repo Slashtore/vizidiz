@@ -712,7 +712,7 @@ ${conditions.length > 0 ? conditions.join('\n') : 'Стандартные усл
                 {/* Inputs based on service */}
                 <div className="grid grid-cols-1 gap-6">
                   {service === 'interior' && (
-                    <NumberInput label="Площадь помещения (м²)" subLabel="мин. 10" value={area} onChange={(e: any) => setArea(Math.max(10, parseInt(e.target.value) || 0))} />
+                    <NumberInput label="Площадь помещения (м²)" subLabel="мин. 10" value={area} onChange={(e: any) => setArea(parseInt(e.target.value) || 0)}onBlur={() => setArea(Math.max(10, area))} />
                   )}
                   {(service === 'exterior' || service === 'promo') && (
                     <NumberInput label={service === 'promo' ? "Количество кадров" : "Количество ракурсов"} subLabel="шт" value={views} onChange={(e: any) => setViews(Math.max(1, parseInt(e.target.value) || 0))} />
