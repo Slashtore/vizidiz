@@ -2,3 +2,14 @@
   Global styles are in index.html via Tailwind CDN + inline <style>.
   This file exists only to satisfy Vite build.
 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
