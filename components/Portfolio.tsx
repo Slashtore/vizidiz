@@ -6,6 +6,12 @@ import { PROJECTS } from '../constants';
 const Portfolio: React.FC = () => {
   const [filter, setFilter] = useState<ProjectCategory>(ProjectCategory.ALL);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Свайп стейт
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
 
   const filteredProjects = filter === ProjectCategory.ALL 
     ? PROJECTS 
@@ -19,21 +25,14 @@ const Portfolio: React.FC = () => {
     { value: ProjectCategory.MODELING, label: 'Моделинг' },
   ];
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-    // Навигация клавишами (стрелки влево/вправо, Escape)
+  // Навигация клавишами
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Работает только если проект открыт
       if (!selectedProject) return;
-
-      // Закрыть модальное окно по Escape
       if (e.key === 'Escape') {
         setSelectedProject(null);
         return;
       }
-
-      // Листать картинки стрелками (если их больше 1)
       if (selectedProject.imageUrls.length > 1) {
         if (e.key === 'ArrowLeft') {
           setCurrentImageIndex(prev => prev === 0 ? selectedProject.imageUrls.length - 1 : prev - 1);
@@ -42,11 +41,37 @@ const Portfolio: React.FC = () => {
         }
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedProject]);
-  
+
+  // Свайп обработчики
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!selectedProject || !touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (selectedProject.imageUrls.length > 1) {
+      if (isLeftSwipe) {
+        setCurrentImageIndex(prev => prev === selectedProject.imageUrls.length - 1 ? 0 : prev + 1);
+      }
+      if (isRightSwipe) {
+        setCurrentImageIndex(prev => prev === 0 ? selectedProject.imageUrls.length - 1 : prev - 1);
+      }
+    }
+  };
+
   return (
     <section id="portfolio" className="py-24 bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,13 +124,21 @@ const Portfolio: React.FC = () => {
 
       {/* Project Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedProject(null)}>
+        <div 
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm overflow-y-auto" 
+          onClick={() => setSelectedProject(null)}
+        >
           <div 
             className="bg-slate-900 rounded-xl overflow-hidden max-w-5xl w-full max-h-[90vh] flex flex-col md:flex-row shadow-2xl border border-slate-700" 
             onClick={e => e.stopPropagation()}
           >
             {/* Image Slider Container */}
-            <div className="w-full md:w-2/3 h-64 md:h-[70vh] bg-black relative flex items-center justify-center overflow-hidden group">
+            <div 
+              className="w-full md:w-2/3 h-[50vh] md:h-[70vh] bg-black relative flex items-center justify-center overflow-hidden group touch-pan-y"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               {selectedProject.imageUrls.map((url, index) => (
                 <img 
                   key={index}
@@ -117,7 +150,7 @@ const Portfolio: React.FC = () => {
                 />
               ))}
   
-              {/* Кнопки навигации (показываются если картинок > 1) */}
+              {/* Кнопки навигации */}
               {selectedProject.imageUrls.length > 1 && (
                 <>
                   <button 
