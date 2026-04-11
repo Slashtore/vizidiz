@@ -40,21 +40,3 @@
 .touch-pan-y {
   touch-action: pan-y pinch-zoom;
 }
-
-/* Фикс для портретных изображений на мобильных */
-@media (max-width: 768px) {
-  #portfolio .fixed .bg-black.relative {
-    height: auto !important;
-    min-height: 50vh !important;
-    max-height: 70vh !important;
-  }
-  #portfolio .fixed .bg-black.relative img {
-    position: relative !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: 70vh !important;
-  }
-  #portfolio .fixed .bg-black.relative button.absolute {
-    top: 50% !important;
-  }
-}
